@@ -5,7 +5,8 @@ defmodule Ueberauth.Strategy.LinkedIn do
 
   use Ueberauth.Strategy,
     uid_field: :id,
-    default_scope: "r_basicprofile r_emailaddress"
+    default_scope: "r_basicprofile r_emailaddress",
+    profile_fields: "id,picture-url,email-address,firstName,lastName"
 
   alias Ueberauth.Auth.Info
   alias Ueberauth.Auth.Credentials
@@ -126,13 +127,14 @@ defmodule Ueberauth.Strategy.LinkedIn do
 
   defp skip_url_encode_option, do: [path_encode_fun: fn(a) -> a end]
 
-  defp user_query do
-    "/v1/people/~:(id,picture-url,email-address,firstName,lastName)?format=json"
+  defp user_query(conn) do
+    profile_fields = option(conn, :profile_fields)
+    "/v1/people/~:(#{profile_fields})?format=json"
   end
 
   defp fetch_user(conn, token) do
     conn = put_private(conn, :linkedin_token, token)
-    resp = Ueberauth.Strategy.LinkedIn.OAuth.get(token, user_query, [], skip_url_encode_option)
+    resp = Ueberauth.Strategy.LinkedIn.OAuth.get(token, user_query(conn), [], skip_url_encode_option)
 
 IO.puts("linkedin fetch_user, resp = #{inspect resp}")
 

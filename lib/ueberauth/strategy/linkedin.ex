@@ -136,8 +136,6 @@ defmodule Ueberauth.Strategy.LinkedIn do
     conn = put_private(conn, :linkedin_token, token)
     resp = Ueberauth.Strategy.LinkedIn.OAuth.get(token, user_query(conn), [], skip_url_encode_option)
 
-IO.puts("linkedin fetch_user, resp = #{inspect resp}")
-
     case resp do
       { :ok, %OAuth2.Response{status_code: 401, body: _body}} ->
         set_errors!(conn, [error("token", "unauthorized")])

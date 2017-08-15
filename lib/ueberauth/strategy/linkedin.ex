@@ -21,13 +21,17 @@ defmodule Ueberauth.Strategy.LinkedIn do
     scopes = conn.params["scope"] || option(conn, :default_scope)
     state =
       conn.params["state"] || Base.encode64(:crypto.strong_rand_bytes(16))
+    
+    cookie_options =
+      (option(conn, :cookie_domain) && [{:domain, option(conn, :cookie_domain)}] || []) ++
+      (option(conn, :cookie_path) && [{:path, option(conn, :cookie_path)}] || [])
 
     opts = [scope: scopes,
             state: state,
             redirect_uri: callback_url(conn)]
 
     conn
-    |> put_resp_cookie(@state_cookie_name, state)
+    |> put_resp_cookie(@state_cookie_name, state, cookie_options)
     |> redirect!(Ueberauth.Strategy.LinkedIn.OAuth.authorize_url!(opts))
   end
 

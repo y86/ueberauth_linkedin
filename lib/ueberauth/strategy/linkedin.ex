@@ -36,8 +36,8 @@ defmodule Ueberauth.Strategy.LinkedIn do
       |> redirect!(Ueberauth.Strategy.LinkedIn.OAuth.authorize_url!(opts))
     Logger.info(
     """
-      state: #{state}\n
-      cookies: #{IO.inspect(conn.cookies)}
+    state: #{state}\n
+    cookies[#{@state_cookie_name}]: #{conn.cookies[@state_cookie_name]}    
     """
     )
     conn

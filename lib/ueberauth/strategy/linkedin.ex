@@ -2,7 +2,8 @@ defmodule Ueberauth.Strategy.LinkedIn do
   @moduledoc """
   LinkedIn Strategy for Überauth.
   """
-
+  require Logger
+  
   use Ueberauth.Strategy,
     uid_field: :id,
     default_scope: "r_basicprofile r_emailaddress",
@@ -29,10 +30,17 @@ defmodule Ueberauth.Strategy.LinkedIn do
     opts = [scope: scopes,
             state: state,
             redirect_uri: callback_url(conn)]
-
+    conn = 
+      conn
+      |> put_resp_cookie(@state_cookie_name, state, cookie_options)
+      |> redirect!(Ueberauth.Strategy.LinkedIn.OAuth.authorize_url!(opts))
+    Logger.info(
+    """
+      state: #{state}\n
+      cookies: #{IO.inspect(conn.cookies)}
+    """
+    )
     conn
-    |> put_resp_cookie(@state_cookie_name, state, cookie_options)
-    |> redirect!(Ueberauth.Strategy.LinkedIn.OAuth.authorize_url!(opts))
   end
 
   @doc """
